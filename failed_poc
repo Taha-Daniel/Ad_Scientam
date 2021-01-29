@@ -1,0 +1,101 @@
+
+-import re
+-
+-
+-def dict_fusion(dict1, dict2, index=1):
+-   """
+-   Fusion between two dictionnary which can have same key (if same key we sum the value together)
+-   """
+-   dict = {}
+-   keys = set(dict1) | set(dict2)
+-   for key in keys:
+-       dict[key] = ((dict1.get(key, 0) or 0) + (dict2.get(key, 0) or 0)) * index
+-   return dict
+-
+-
+-def keychange(function, dic, key):
+-    dic.pop(key, None)
+-    if dic == 1:
+-        dic = {}
+-    return fusion(function(key), dic)
+-
+-
+-def tup_to_dict(tup, val):
+-    """
+-    Transform a tup to a dict and multiply the index with val
+-    :param tup:
+-    :param val:
+-    :return:
+-    """
+-    dic = {}
+-    for x, y in tup:
+-        if x not in dic.keys():
+-            dic[x] = int(y) or 1
+-        else:
+-            dic[x] += int(y) or 1
+-    return dic
+-
+-
+-def separe_atoms(string, value=1):
+-    """
+-    Separate a list of atoms in a dict with indexes of each atoms
+-    :param string: 
+-    :param value: 
+-    :return: 
+-    """
+-    listatom = re.findall('([A-Z][a-z]?)(\d*)', string)
+-    dict_atom = tup_to_dict(listatom, value)
+-    return dict_atom
+-
+-
+-def separe_parenthesis(str, par="()", val=1):
+-    """
+-    Take a parenthesis to create a dict separating into 2 keys (inside and outside parenthesis) and their index.
+-    To multiply the index with val
+-    :param str:
+-    :param par:
+-    :param val:
+-    :return:
+-    """
+-    if par == "()":
+-        tup = re.findall(r'\((\w*)\)(\d*)', str)
+-        di = tup_to_dict(tup, val)
+-        di[(re.sub(r'\((\w*)\)(\d*)', '', str))] = val
+-
+-    elif par == "[]":
+-        tup = re.findall(r'\[(\w*)\](\d*)', str)
+-        di = tup_to_dict(tup, val)
+-        di[(re.sub(r'\[(\w*)\](\d*)', '', str))] = val
+-
+-    elif par == "{}":
+-        tup = re.findall(r'\{(\w*)\}(\d*)', str)
+-        di = tup_to_dict(tup, val)
+-        di[(re.sub(r'\{(\w*)\}(\d*)', '', str))] = val
+-
+-    return di
+-
+-
+-def execute(string):
+-    dic = {string : 1}
+-    temp_dic = {}
+-
+-    while dic != temp_dic:
+-        temp_dic = dic
+-        print(temp_dic)
+-        for key in list(dic):
+-            if '[' in key:
+-                val = temp_dic[key]
+-                dic = keychange(lambda x: separe_parenthesis(x, "[]", dic[key]), dic, key)
+-            if '{' in key:
+-                val = temp_dic[key]
+-                dic = keychange(lambda x: separe_parenthesis(x, "{}", dic[key]), dic, key)
+-            if '(' in key:
+-                val = temp_dic[key]
+-                dic = keychange(lambda x: separe_parenthesis(x, "()", val), dic, key)
+-            else:
+-                dic = keychange(lambda x: separe_atoms(x), dic, key)
+-        print(temp_dic)
+-    return temp_dic
+-
+-
+
